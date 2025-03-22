@@ -174,7 +174,7 @@ TicketPro is a ticketing system website where users can browse, search, and purc
   - Displays the selected tickets, quantities, and total price.
 - **Call-to-Action Button**: "Confirm Purchase" completes the transaction.
 
-[Link to Figma Prototype](#) (or attach images of hand-drawn sketches).
+
 
 
 ## 4. Information Architecture and Technical Design
