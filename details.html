@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event Details</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Remix Icon CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- Header -->
+  <header class="bg-indigo-600 text-white p-4 text-center font-bold text-xl">
+    Event Details
+  </header>
+
+  <div class="container mx-auto px-4 py-10">
+    <div id="event-details" class="bg-white shadow-lg rounded-lg p-8">
+      <img id="event-image" src="" alt="Event Image" class="w-full h-96 object-cover rounded-lg mb-6">
+      <h1 id="event-title" class="text-4xl font-bold mb-4"></h1>
+      <p id="event-description" class="text-lg mb-4"></p>
+      <div class="flex flex-wrap items-center gap-6 mb-6 text-gray-600">
+        <div class="flex items-center gap-2">
+          <i class="ri-map-pin-line text-xl"></i>
+          <span id="event-location"></span>
+        </div>
+        <div class="flex items-center gap-2">
+          <i class="ri-calendar-line text-xl"></i>
+          <span id="event-date"></span>
+        </div>
+        <div class="flex items-center gap-2">
+          <strong>Price:</strong>
+          $<span id="event-price"></span>
+        </div>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-4">
+        <button class="bg-indigo-600 text-white px-6 py-3 rounded-full font-medium hover:bg-indigo-700 transition-colors">
+          Buy Tickets
+        </button>
+        <a href="checkout.html" class="bg-green-600 text-white px-6 py-3 rounded-full font-medium hover:bg-green-700 transition-colors text-center">
+          Checkout
+        </a>
+      </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center mt-6">
+      <a href="index.html" class="inline-block text-indigo-600 hover:underline">
+        ← Back to Events
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const events = {
+      taylor: {
+        title: "Taylor Swift – The Eras Tour",
+        description: "Experience the music journey through all of Taylor's eras.",
+        location: "Wembley Stadium, London",
+        date: "June 15, 2025",
+        price: "129",
+        image: "https://public.readdy.ai/ai/img_res/73e7abc4c80ed83a1fa395b08ae60af5.jpg"
+      },
+      nba: {
+        title: "NBA: Lakers vs Warriors",
+        description: "Experience the intense rivalry between two NBA giants.",
+        location: "Crypto.com Arena, Los Angeles",
+        date: "Tomorrow, 8:00 PM",
+        price: "89",
+        image: "https://public.readdy.ai/ai/img_res/19846bef889248e6c9c63fe2bbfd688f.jpg"
+      },
+      hamilton: {
+        title: "Hamilton",
+        description: "Award-winning Broadway musical blending hip-hop and history.",
+        location: "Richard Rodgers Theatre",
+        date: "April 20, 2025",
+        price: "199",
+        image: "https://public.readdy.ai/ai/img_res/0a94838dac105cd8f1408bab96d9a773.jpg"
+      },
+      chappelle: {
+        title: "Dave Chappelle Live",
+        description: "A night full of laughs with comedy legend Dave Chappelle.",
+        location: "Radio City Music Hall",
+        date: "April 22, 2025",
+        price: "79",
+        image: "https://public.readdy.ai/ai/img_res/ab40321fc3b2cc82083a8b33803e680c.jpg"
+      },
+      symphony: {
+        title: "London Symphony Orchestra",
+        description: "An enchanting evening of classical music excellence.",
+        location: "Royal Albert Hall",
+        date: "April 25, 2025",
+        price: "150",
+        image: "https://public.readdy.ai/ai/img_res/d6c809e39e4bc73e8a3701e35a6c8d95.jpg"
+      }
+    };
+
+    const queryParams = new URLSearchParams(window.location.search);
+    const eventKey = queryParams.get("event");
+
+    if (events[eventKey]) {
+      const event = events[eventKey];
+      document.getElementById("event-title").textContent = event.title;
+      document.getElementById("event-description").textContent = event.description;
+      document.getElementById("event-location").textContent = event.location;
+      document.getElementById("event-date").textContent = event.date;
+      document.getElementById("event-price").textContent = event.price;
+      document.getElementById("event-image").src = event.image;
+    } else {
+      document.getElementById("event-details").innerHTML = `
+        <p class="text-center text-red-500 text-xl font-semibold">
+          Event not found. Please return to the homepage.
+        </p>
+      `;
+    }
+  </script>
+
+</body>
+
+</html>

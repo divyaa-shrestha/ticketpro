@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicketPro - Get Your Event Tickets</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563EB',
+                        secondary: '#10B981'
+                    },
+                    borderRadius: {
+                        'none': '0px',
+                        'sm': '4px',
+                        DEFAULT: '4px',
+                        'md': '12px',
+                        'lg': '16px',
+                        'xl': '20px',
+                        '2xl': '24px',
+                        '3xl': '32px',
+                        'full': '9999px',
+                        'button': '4px'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :where([class^="ri-"])::before {
+            content: "\f3c2";
+        }
+
+        .event-card:hover .event-overlay {
+            opacity: 1;
+        }
+
+        .category-btn.active {
+            background-color: #4F46E5;
+            color: white;
+        }
+
+        .search-results {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            z-index: 50;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .search-input:focus+.search-results {
+            display: block;
+        }
+
+        .image-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-container:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .hover-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hover-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        .hover-container:hover .hover-overlay {
+            opacity: 1;
+        }
+
+        .hover-container:hover img {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+
+<body class="bg-white">
+    <header class="bg-white shadow-sm fixed w-full z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center">
+                    <a href="#"
+                        class="text-3xl font-['Pacifico'] text-primary hover:text-primary/90 transition-colors">logo</a>
+                    <nav class="ml-12 flex items-center space-x-8">
+                        <a href="#" class="text-gray-900 hover:text-primary font-medium">Events</a>
+                        <a href="#" class="text-gray-600 hover:text-primary">Venues</a>
+                        <a href="#" class="text-gray-600 hover:text-primary">Gift Cards</a>
+                        <a href="#" class="text-gray-600 hover:text-primary">Help</a>
+                    </nav>
+                </div>
+                <div class="flex-1 max-w-2xl mx-12 relative">
+                    <div class="relative">
+                        <input type="text" placeholder="Search events, artists, or venues..."
+                            class="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-full text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:bg-gray-50 focus:ring-2 focus:ring-primary/20 transition-all search-input">
+                        <div
+                            class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400">
+                            <i class="ri-search-line"></i>
+                        </div>
+                    </div>
+                    <div class="search-results bg-white shadow-lg rounded-2xl">
+                        <div class="p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="text-sm font-medium text-gray-700">Popular Searches</div>
+                                <button class="text-xs text-primary hover:text-primary/80">Clear All</button>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex items-center p-3 hover:bg-gray-50 rounded-xl cursor-pointer group">
+                                    <i class="ri-time-line mr-3 text-gray-400 group-hover:text-primary"></i>
+                                    <div>
+                                        <span class="text-gray-900">Taylor Swift Concert 2025</span>
+                                        <div class="text-xs text-gray-500 mt-0.5">March 15 • Wembley Stadium</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-3 hover:bg-gray-50 rounded-xl cursor-pointer group">
+                                    <i class="ri-time-line mr-3 text-gray-400 group-hover:text-primary"></i>
+                                    <div>
+                                        <span class="text-gray-900">NBA All-Star Game</span>
+                                        <div class="text-xs text-gray-500 mt-0.5">March 20 • Madison Square Garden</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-3 hover:bg-gray-50 rounded-xl cursor-pointer group">
+                                    <i class="ri-time-line mr-3 text-gray-400 group-hover:text-primary"></i>
+                                    <div>
+                                        <span class="text-gray-900">Broadway Shows</span>
+                                        <div class="text-xs text-gray-500 mt-0.5">Multiple dates • Various Theaters
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t">
+                                <div class="text-xs text-gray-500 mb-2">Recent Searches</div>
+                                <div class="flex flex-wrap gap-2">
+                                    <span
+                                        class="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs cursor-pointer hover:bg-gray-200">Ed
+                                        Sheeran</span>
+                                    <span
+                                        class="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs cursor-pointer hover:bg-gray-200">Premier
+                                        League</span>
+                                    <span
+                                        class="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-xs cursor-pointer hover:bg-gray-200">Comedy
+                                        Shows</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <button
+                        class="w-12 h-12 flex items-center justify-center text-gray-600 hover:text-primary relative cursor-pointer group">
+                        <i class="ri-shopping-cart-2-line text-xl"></i>
+                        <span
+                            class="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center group-hover:bg-primary/90">3</span>
+                    </button>
+                    <div class="relative group">
+                        <button
+                            class="w-12 h-12 flex items-center justify-center text-gray-600 hover:text-primary cursor-pointer">
+                            <i class="ri-user-line text-xl"></i>
+                        </button>
+                        <div
+                            class="hidden group-hover:block absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-lg p-4">
+                            <div class="flex items-center space-x-3 pb-4 border-b">
+                                <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <i class="ri-user-line text-2xl text-gray-400"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium">Guest User</div>
+                                    <div class="text-xs text-gray-500">Sign in to access your account</div>
+                                </div>
+                            </div>
+                            <div class="py-2">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">My
+                                    Tickets</a>
+                                <a href="#"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">Order
+                                    History</a>
+                                <a href="#"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">Settings</a>
+                            </div>
+                            <div class="pt-2 border-t">
+                                <button
+                                    class="w-full px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-primary/90">Sign
+                                    In</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex items-center space-x-2 py-4 overflow-x-auto categories-nav">
+                <button
+                    class="category-btn active whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-medium transition-all">All
+                    Events</button>
+                <button
+                    class="category-btn whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition-all">
+                    <i class="ri-music-line mr-2"></i>Concerts
+                </button>
+                <button
+                    class="category-btn whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition-all">
+                    <i class="ri-basketball-line mr-2"></i>Sports
+                </button>
+                <button
+                    class="category-btn whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition-all">
+                    <i class="ri-movie-line mr-2"></i>Theater
+                </button>
+                <button
+                    class="category-btn whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition-all">
+                    <i class="ri-emotion-laugh-line mr-2"></i>Comedy
+                </button>
+                <button
+                    class="category-btn whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition-all">
+                    <i class="ri-group-line mr-2"></i>Family
+                </button>
+                <button
+                    class="category-btn whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition-all">
+                    <i class="ri-palette-line mr-2"></i>Arts & Culture
+                </button>
+            </nav>
+        </div>
+    </header>
+    <main class="pt-32">
+        <section class="relative bg-gradient-to-r from-primary to-secondary overflow-hidden" style="height: 500px;">
+            <div class="container mx-auto px-4 h-full flex items-center">
+                <div class="w-1/2 text-white">
+                    <h1 class="text-5xl font-bold mb-6">Taylor Swift<br>The Eras Tour</h1>
+                    <p class="text-xl mb-8 opacity-90">Experience the music journey through all of Taylor's eras</p>
+                    <div class="flex items-center space-x-4 mb-8">
+                        <div class="flex items-center">
+                            <i class="ri-map-pin-line mr-2"></i>
+                            <span>Wembley Stadium, London</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="ri-calendar-line mr-2"></i>
+                            <span>June 15, 2025</span>
+                        </div>
+                    </div>
+                    <a href="details.html?event=taylor">
+                        <button class="bg-white text-primary px-8 py-3 rounded-button font-semibold hover:bg-opacity-90 transition-all cursor-pointer">
+                          View Details
+                        </button>
+                      </a>
+                      
+
+                </div>
+                <div class="absolute right-0 top-0 w-1/2 h-full">
+                    <div class="hover-container w-full h-full">
+                        <img src="https://public.readdy.ai/ai/img_res/73e7abc4c80ed83a1fa395b08ae60af5.jpg"
+                            class="object-cover w-full h-full" alt="Concert Stage">
+                        <div class="hover-overlay flex items-center justify-center">
+                            <button
+                                class="bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-opacity-90">Buy
+                                Tickets</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <div class="flex items-center justify-between mb-12">
+                    <h2 class="text-3xl font-bold">Trending Events</h2>
+                    <div class="inline-flex bg-white rounded-full shadow-sm p-1">
+                        <button class="px-6 py-2 text-sm font-medium text-white bg-primary rounded-full">This
+                            Weekend</button>
+                        <button class="px-6 py-2 text-sm font-medium text-gray-600 hover:text-primary rounded-full">This
+                            Week</button>
+                        <button class="px-6 py-2 text-sm font-medium text-gray-600 hover:text-primary rounded-full">This
+                            Month</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-8">
+                    <div class="col-span-2 space-y-6">
+                        <div
+                            class="group bg-white rounded-2xl shadow-sm overflow-hidden cursor-pointer hover:shadow-lg transition-all">
+                            <div class="flex h-[400px]">
+                                <div class="w-1/3 relative">
+                                    <div class="hover-container w-full h-full">
+                                        <img src="https://public.readdy.ai/ai/img_res/19846bef889248e6c9c63fe2bbfd688f.jpg"
+                                            class="w-full h-full object-cover" alt="NBA Game">
+                                        <div class="hover-overlay flex items-center justify-center">
+                                            <button
+                                                class="bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-opacity-90">Buy
+                                                Tickets</button>
+                                        </div>
+                                    </div>
+
+                            
+                                    <div
+                                        class="absolute top-4 left-4 bg-primary/90 text-white px-3 py-1 rounded-full text-sm">
+                                        Featured</div>
+                                </div>
+                                <div class="w-2/3 p-6 flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex items-center justify-between mb-3">
+                                            <span class="text-sm text-primary font-medium">Sports</span>
+                                            <div class="flex items-center space-x-2">
+                                                <i class="ri-time-line text-gray-400"></i>
+                                                <span class="text-sm text-gray-500">Tomorrow, 8:00 PM</span>
+                                            </div>
+                                        </div>
+                                        <h3 class="text-xl font-bold mb-2">NBA: Lakers vs Warriors</h3>
+                                        <p class="text-gray-600 text-sm mb-4">Experience the intense rivalry between two
+                                            NBA giants in this highly anticipated matchup.</p>
+                                        <div class="flex items-center text-sm text-gray-600">
+                                            <i class="ri-map-pin-line mr-2"></i>
+                                            <span>Crypto.com Arena, Los Angeles</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between mt-4">
+                                        <div>
+                                            <span class="text-gray-500 text-sm">Starting from</span>
+                                            <div class="text-xl font-bold text-gray-900">$89</div>
+                                        </div>
+                                        <button
+                                            class="bg-primary text-white px-6 py-2.5 rounded-full font-medium hover:bg-primary/90 transition-colors">Get
+                                            Tickets</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div
+                                class="bg-white rounded-2xl shadow-sm overflow-hidden cursor-pointer hover:shadow-lg transition-all">
+                                <div class="relative h-48">
+                                    <div class="hover-container w-full h-full">
+                                        <img src="https://public.readdy.ai/ai/img_res/0a94838dac105cd8f1408bab96d9a773.jpg"
+                                            class="w-full h-full object-cover" alt="Theater Show">
+                                        <div class="hover-overlay flex items-center justify-center">
+                                            <button
+                                                class="bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-opacity-90 transition-all transform hover:scale-105">Buy
+                                                Tickets</button>
+                                        </div>
+                                    </div>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                                    <div class="absolute bottom-4 left-4 text-white">
+                                        <div class="text-sm font-medium mb-1">Theater</div>
+                                        <h3 class="text-lg font-bold">Hamilton</h3>
+                                    </div>
+                                    <div
+                                        class="absolute top-4 right-4 bg-white/90 text-primary px-3 py-1 rounded-full text-sm font-medium">
+                                        Few seats left</div>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center text-sm text-gray-600">
+                                            <i class="ri-map-pin-line mr-2"></i>
+                                            <span>Richard Rodgers Theatre</span>
+                                        </div>
+                                        <div class="text-lg font-bold">$199</div>
+                                    </div>
+                                    <a href="details.html?event=hamilton" class="w-full block">
+                                        <button class="w-full bg-primary text-white py-2 rounded-full font-medium hover:bg-opacity-90 transition-colors">
+                                          View Details
+                                        </button>
+                                      </a>
+                                      
+                                </div>
+                            </div>
+                            <div
+                                class="bg-white rounded-2xl shadow-sm overflow-hidden cursor-pointer hover:shadow-lg transition-all">
+                                <div class="relative h-48">
+                                    <div class="hover-container w-full h-full">
+                                        <img src="https://public.readdy.ai/ai/img_res/ab40321fc3b2cc82083a8b33803e680c.jpg"
+                                            class="w-full h-full object-cover" alt="Comedy Show">
+                                        <div class="hover-overlay flex items-center justify-center">
+                                            <button
+                                                class="bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-opacity-90">Buy
+                                                Tickets</button>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none">
+                                    </div>
+                                    <div class="absolute bottom-4 left-4 text-white pointer-events-none">
+                                        <div class="text-sm font-medium mb-1">Comedy</div>
+                                        <h3 class="text-lg font-bold">Dave Chappelle Live</h3>
+                                    </div>
+                                    <div
+                                        class="absolute top-4 right-4 bg-white/90 text-primary px-3 py-1 rounded-full text-sm font-medium pointer-events-none">
+                                        Selling fast</div>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center text-sm text-gray-600">
+                                            <i class="ri-map-pin-line mr-2"></i>
+                                            <span>Radio City Music Hall</span>
+                                        </div>
+                                        <div class="text-lg font-bold">$79</div>
+                                    </div>
+                                    <a href="details.html" class="w-full block">
+                                        <button class="w-full bg-primary text-white py-2 rounded-full font-medium hover:bg-opacity-90 transition-colors">
+                                          View Details
+                                        </button>
+                                      </a>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-white rounded-2xl shadow-sm overflow-hidden cursor-pointer hover:shadow-lg transition-all">
+                                <div class="relative h-48">
+                                    <div class="hover-container w-full h-full">
+                                        <img src="https://public.readdy.ai/ai/img_res/d6c809e39e4bc73e8a3701e35a6c8d95.jpg"
+                                            class="w-full h-full object-cover" alt="Classical Concert">
+                                        <div class="hover-overlay flex items-center justify-center">
+                                            <button
+                                                class="bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-opacity-90">Buy
+                                                Tickets</button>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none">
+                                    </div>
+                                    <div class="absolute bottom-4 left-4 text-white pointer-events-none">
+                                        <div class="text-sm font-medium mb-1">Classical</div>
+                                        <h3 class="text-lg font-bold">London Symphony Orchestra</h3>
+                                    </div>
+                                    <div
+                                        class="absolute top-4 right-4 bg-white/90 text-primary px-3 py-1 rounded-full text-sm font-medium pointer-events-none">
+                                        Premium Event</div>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center text-sm text-gray-600">
+                                            <i class="ri-map-pin-line mr-2"></i>
+                                            <span>Royal Albert Hall</span>
+                                        </div>
+                                        <div class="text-lg font-bold">$150</div>
+                                    </div>
+                                    <a href="details.html" class="w-full">
+                                        <button class="w-full bg-primary text-white py-2 rounded-full font-medium hover:bg-opacity-90 transition-colors">
+                                          View Details
+                                        </button>
+                                      </a>
+                                      
+                                </div>
+                            </div>
+                            <div
+                                class="bg-white rounded-2xl shadow-sm overflow-hidden cursor-pointer hover:shadow-lg transition-all">
+                                <div class="relative h-48">
+                                    <div class="hover-container w-full h-full">
+                                        <img src="https://public.readdy.ai/ai/img_res/6a5d88a12c1288e93d9659b274e57324.jpg"
+                                            class="w-full h-full object-cover" alt="EDM Festival">
+                                        <div class="hover-overlay flex items-center justify-center">
+                                            <button
+                                                class="bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-opacity-90">Buy
+                                                Tickets</button>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none">
+                                    </div>
+                                    <div class="absolute bottom-4 left-4 text-white pointer-events-none">
+                                        <div class="text-sm font-medium mb-1">Festival</div>
+                                        <h3 class="text-lg font-bold">Electric Wonderland</h3>
+                                    </div>
+                                    <div
+                                        class="absolute top-4 right-4 bg-white/90 text-primary px-3 py-1 rounded-full text-sm font-medium pointer-events-none">
+                                        Early Bird</div>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center text-sm text-gray-600">
+                                            <i class="ri-map-pin-line mr-2"></i>
+                                            <span>Central Park</span>
+                                        </div>
+                                        <div class="text-lg font-bold">$129</div>
+                                    </div>
+                                    <a href="details.html" class="w-full">
+                                    
+                                    <button
+                                        class="w-full bg-primary text-white py-2 rounded-full font-medium hover:bg-opacity-90 transition-colors">View
+                                        Details</button>
+                                    </a>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-white rounded-2xl shadow-sm overflow-hidden cursor-pointer hover:shadow-lg transition-all">
+                                <div class="relative h-48">
+                                    <div class="hover-container w-full h-full">
+                                        <img src="https://public.readdy.ai/ai/img_res/f5297d32037064de9333768913afc55f.jpg"
+                                            class="w-full h-full object-cover" alt="Art Exhibition">
+                                        <div class="hover-overlay flex items-center justify-center">
+                                            <button
+                                                class="bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-opacity-90">Buy
+                                                Tickets</button>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none">
+                                    </div>
+                                    <div class="absolute bottom-4 left-4 text-white pointer-events-none">
+                                        <div class="text-sm font-medium mb-1">Exhibition</div>
+                                        <h3 class="text-lg font-bold">Modern Art Showcase</h3>
+                                    </div>
+                                    <div
+                                        class="absolute top-4 right-4 bg-white/90 text-primary px-3 py-1 rounded-full text-sm font-medium pointer-events-none">
+                                        New</div>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center text-sm text-gray-600">
+                                            <i class="ri-map-pin-line mr-2"></i>
+                                            <span>Metropolitan Museum</span>
+                                        </div>
+                                        <div class="text-lg font-bold">$45</div>
+                                    </div>
+                                    <a href="details.html" class="w-full">
+                                    
+                                    <button
+                                        class="w-full bg-primary text-white py-2 rounded-full font-medium hover:bg-opacity-90 transition-colors">View
+                                        Details</button>
+                                    </a>
+                                </div>
+                            </div>
+                            <div
+                                class="bg-white rounded-2xl shadow-sm overflow-hidden cursor-pointer hover:shadow-lg transition-all">
+                                <div class="relative h-48">
+                                    <div class="hover-container w-full h-full">
+                                        <img src="https://public.readdy.ai/ai/img_res/3a1166dde79e331566cbd2da96bfe4aa.jpg"
+                                            class="w-full h-full object-cover" alt="Food Festival">
+                                        <div class="hover-overlay flex items-center justify-center">
+                                            <button
+                                                class="bg-primary text-white px-6 py-2 rounded-button font-medium hover:bg-opacity-90">Buy
+                                                Tickets</button>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none">
+                                    </div>
+                                    <div class="absolute bottom-4 left-4 text-white pointer-events-none">
+                                        <div class="text-sm font-medium mb-1">Food & Wine</div>
+                                        <h3 class="text-lg font-bold">Gourmet Festival</h3>
+                                    </div>
+                                    <div
+                                        class="absolute top-4 right-4 bg-white/90 text-primary px-3 py-1 rounded-full text-sm font-medium pointer-events-none">
+                                        Limited</div>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center text-sm text-gray-600">
+                                            <i class="ri-map-pin-line mr-2"></i>
+                                            <span>Grand Central Market</span>
+                                        </div>
+                                        <div class="text-lg font-bold">$85</div>
+                                    </div>
+                                    <a href="details.html" class="w-full">
+                                    
+                                    <button
+                                        class="w-full bg-primary text-white py-2 rounded-full font-medium hover:bg-opacity-90 transition-colors">View
+                                        Details</button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-1">
+                        <div class="bg-white rounded-2xl shadow-sm p-6 h-[400px]">
+                            <h3 class="text-lg font-bold mb-4">Upcoming Highlights</h3>
+                            <div class="space-y-2">
+                                <div class="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-xl cursor-pointer">
+                                    <div
+                                        class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                                        <i class="ri-music-line text-xl"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-medium">Ed Sheeran World Tour</h4>
+                                        <div class="text-sm text-gray-500">March 20 • Wembley Stadium</div>
+                                    </div>
+                                    <div class="text-sm font-medium text-primary">$129</div>
+                                </div>
+                                <div class="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-xl cursor-pointer">
+                                    <div
+                                        class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                                        <i class="ri-football-line text-xl"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-medium">Premier League: Arsenal vs Chelsea</h4>
+                                        <div class="text-sm text-gray-500">March 25 • Emirates Stadium</div>
+                                    </div>
+                                    <div class="text-sm font-medium text-primary">$75</div>
+                                </div>
+                                <div class="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-xl cursor-pointer">
+                                    <div
+                                        class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                                        <i class="ri-movie-line text-xl"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-medium">Cirque du Soleil</h4>
+                                        <div class="text-sm text-gray-500">April 1 • Royal Albert Hall</div>
+                                    </div>
+                                    <div class="text-sm font-medium text-primary">$150</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer">
+                                <div
+                                    class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                                    <i class="ri-calendar-line text-xl"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-medium">View All Events</h4>
+                                    <div class="text-sm text-gray-500">See what's coming up next</div>
+                                </div>
+                                <i class="ri-arrow-right-line text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-12">
+                    <button
+                        class="bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-300 px-8 py-3 rounded-button font-semibold flex items-center space-x-2">
+                        <span>See More Events</span>
+                        <i class="ri-arrow-right-line"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-2xl font-bold mb-8">Popular Venues</h2>
+                <div class="grid grid-cols-3 gap-6">
+                    <div class="bg-white rounded-lg shadow-sm p-6 cursor-pointer hover:shadow-md transition-shadow">
+                        <div class="image-container">
+                            <img src="https://public.readdy.ai/ai/img_res/4559a71eece40737ffdce89faf530d0a.jpg"
+                                class="w-full h-48 object-cover rounded-lg mb-4" alt="Madison Square Garden">
+                            <div class="image-overlay rounded-lg">
+                                <button class="text-white bg-primary/90 px-4 py-2 rounded-button">Buy Tickets</button>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-white">Madison Square Garden</h3>
+                        <p class="text-sm text-gray-400 mb-4">New York, NY</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">15 upcoming events</span>
+                            <button class="text-primary text-sm font-medium" onclick="showEventDetails(this)">View
+                                Details →</button>
+                                
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-6 cursor-pointer hover:shadow-md transition-shadow">
+                        <div class="image-container">
+                            <img src="https://public.readdy.ai/ai/img_res/82ab92d0e60bec1b04759681a05a596b.jpg"
+                                class="w-full h-48 object-cover rounded-lg mb-4" alt="O2 Arena">
+                            <div class="image-overlay rounded-lg">
+                                <button class="text-white bg-primary/90 px-4 py-2 rounded-button">Buy Tickets</button>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-white">The O2 Arena</h3>
+                        <p class="text-sm text-gray-400 mb-4">London, UK</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">12 upcoming events</span>
+                            <button class="text-primary text-sm font-medium" onclick="showEventDetails(this)">View
+                                Details →</button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm p-6 cursor-pointer hover:shadow-md transition-shadow">
+                        <div class="image-container">
+                            <img src="https://public.readdy.ai/ai/img_res/5a454d12950edf63ed74d492632cd298.jpg"
+                                class="w-full h-48 object-cover rounded-lg mb-4" alt="Crypto.com Arena">
+                            <div class="image-overlay rounded-lg">
+                                <button class="text-white bg-primary/90 px-4 py-2 rounded-button">Buy Tickets</button>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-white">Crypto.com Arena</h3>
+                        <p class="text-sm text-gray-400 mb-4">Los Angeles, CA</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">18 upcoming events</span>
+                            <button class="text-primary text-sm font-medium" onclick="showEventDetails(this)">View
+                                Details →</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-12">
+                    <button
+                        class="bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors duration-300 px-8 py-3 rounded-button font-semibold flex items-center space-x-2">
+                        <span>See More Events</span>
+                        <i class="ri-arrow-right-line"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+        <section class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-2xl font-bold mb-4 text-center">Our Partners</h2>
+                <p class="text-gray-600 mb-8 text-center">Trusted by the world's leading ticketing platforms</p>
+                <div class="grid grid-cols-5 gap-8 items-center">
+                    <div class="flex items-center justify-center grayscale hover:grayscale-0 transition-all">
+                        <i class="ri-ticketmaster-fill text-4xl text-gray-400"></i>
+                        <span class="ml-2 text-lg text-gray-600">Ticketmaster</span>
+                    </div>
+                    <div class="flex items-center justify-center grayscale hover:grayscale-0 transition-all">
+                        <i class="ri-livenation-fill text-4xl text-gray-400"></i>
+                        <span class="ml-2 text-lg text-gray-600">Live Nation</span>
+                    </div>
+                    <div class="flex items-center justify-center grayscale hover:grayscale-0 transition-all">
+                        <i class="ri-stubhub-fill text-4xl text-gray-400"></i>
+                        <span class="ml-2 text-lg text-gray-600">StubHub</span>
+                    </div>
+                    <div class="flex items-center justify-center grayscale hover:grayscale-0 transition-all">
+                        <i class="ri-eventbrite-fill text-4xl text-gray-400"></i>
+                        <span class="ml-2 text-lg text-gray-600">Eventbrite</span>
+                    </div>
+                    <div class="flex items-center justify-center grayscale hover:grayscale-0 transition-all">
+                        <i class="ri-axs-fill text-4xl text-gray-400"></i>
+                        <span class="ml-2 text-lg text-gray-600">AXS</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="bg-gray-50 py-16">
+            <div class="container mx-auto px-4">
+                <div class="max-w-xl mx-auto text-center">
+                    <h2 class="text-2xl font-bold mb-4">Never Miss an Event</h2>
+                    <p class="text-gray-600 mb-8">Subscribe to our newsletter and get personalized event recommendations
+                    </p>
+                    <form class="flex space-x-4">
+                        <input type="email" placeholder="Enter your email"
+                            class="flex-1 px-4 py-3 bg-white text-gray-900 placeholder-gray-500 border border-gray-200 rounded-button focus:outline-none focus:border-primary">
+                        <button type="submit"
+                            class="bg-primary text-white px-8 py-3 rounded-button font-semibold hover:bg-opacity-90 whitespace-nowrap cursor-pointer">Subscribe
+                            Now</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-4 gap-8">
+                <div>
+                    <a href="#" class="text-2xl font-['Pacifico'] text-white mb-6 block">logo</a>
+                    <p class="text-gray-400 mb-6">Your trusted source for event tickets worldwide</p>
+                    <div class="flex space-x-4">
+                        <a href="#"
+                            class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-gray-700 cursor-pointer">
+                            <i class="ri-facebook-fill"></i>
+                        </a>
+                        <a href="#"
+                            class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-gray-700 cursor-pointer">
+                            <i class="ri-twitter-fill"></i>
+                        </a>
+                        <a href="#"
+                            class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 hover:bg-gray-700 cursor-pointer">
+                            <i class="ri-instagram-fill"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Categories</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white cursor-pointer">Concerts</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white cursor-pointer">Sports</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white cursor-pointer">Theater</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white cursor-pointer">Comedy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white cursor-pointer">Arts & Culture</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Help & Support</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white cursor-pointer">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white cursor-pointer">FAQs</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white cursor-pointer">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white cursor-pointer">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white cursor-pointer">Refund Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Download Our App</h3>
+                    <p class="text-gray-400 mb-4">Get the best experience on your phone</p>
+                    <div class="space-y-3">
+                        <a href="#"
+                            class="flex items-center space-x-3 bg-gray-800 px-4 py-3 rounded-lg hover:bg-gray-700 cursor-pointer">
+                            <i class="ri-apple-fill text-2xl"></i>
+                            <div>
+                                <div class="text-xs">Download on the</div>
+                                <div class="font-medium">App Store</div>
+                            </div>
+                        </a>
+                        <a href="#"
+                            class="flex items-center space-x-3 bg-gray-800 px-4 py-3 rounded-lg hover:bg-gray-700 cursor-pointer">
+                            <i class="ri-google-play-fill text-2xl"></i>
+                            <div>
+                                <div class="text-xs">Get it on</div>
+                                <div class="font-medium">Google Play</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 flex items-center justify-between">
+                <div class="text-gray-400">© 2025 TicketPro. All rights reserved.</div>
+                <div class="flex items-center space-x-4">
+                    <img src="https://public.readdy.ai/ai/img_res/a44492e9d2f189057af20efbecc952ec.jpg"
+                        alt="Security Badges" class="h-8">
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const categoryBtns = document.querySelectorAll(".category-btn");
+            categoryBtns.forEach((btn) => {
+                btn.addEventListener("click", function () {
+                    categoryBtns.forEach((b) => b.classList.remove("active"));
+                    this.classList.add("active");
+                });
+            });
+            const eventCards = document.querySelectorAll(".event-card");
+            eventCards.forEach((card) => {
+                card.addEventListener("click", function () {
+                    const modal = document.createElement("div");
+                    modal.className =
+                        "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
+                    modal.innerHTML = `
+      <div class="bg-white rounded-lg max-w-2xl w-full mx-4 overflow-hidden text-gray-900">
+      <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+      <h3 class="text-xl font-bold">${this.querySelector("h3").textContent}</h3>
+      <button class="text-gray-500 hover:text-gray-700 close-modal">
+      <i class="ri-close-line text-2xl"></i>
+      </button>
+      </div>
+      <div class="mb-6">
+      <img src="${this.querySelector("img").src}" class="w-full h-64 object-cover rounded-lg" alt="Event">
+      </div>
+      <div class="grid grid-cols-2 gap-4 mb-6">
+      <div>
+      <div class="text-sm text-gray-600 mb-1">Date & Time</div>
+      <div class="font-medium">March 15, 2025 at 8:00 PM</div>
+      </div>
+      <div>
+      <div class="text-sm text-gray-600 mb-1">Venue</div>
+      <div class="font-medium">${this.querySelector(".text-gray-600 span").textContent}</div>
+      </div>
+      </div>
+      <div class="mb-6">
+      <div class="text-sm text-gray-600 mb-2">Price Range</div>
+      <div class="flex items-center space-x-4">
+      <div class="px-4 py-2 border border-gray-600 rounded-lg">
+      <div class="text-sm text-gray-400">Standard</div>
+      <div class="font-medium">$89 - $129</div>
+      </div>
+      <div class="px-4 py-2 border border-gray-600 rounded-lg">
+      <div class="text-sm text-gray-400">VIP</div>
+      <div class="font-medium">$199 - $299</div>
+      </div>
+      </div>
+      </div>
+      <button class="w-full bg-primary text-white py-3 rounded-button font-semibold hover:bg-opacity-90" onclick="window.location.href='checkout.html'">
+      Continue to Checkout
+      </button>
+      </div>
+      </div>
+      `;
+                    document.body.appendChild(modal);
+                    modal.querySelector(".close-modal").addEventListener("click", () => {
+                        modal.remove();
+                    });
+                });
+            });
+        });
+    </script>
+    
+    <script>
+        function showEventDetails(btn) {
+            const eventCard = btn.closest('.bg-white');
+            const eventName = eventCard.querySelector('h3').textContent;
+            const location = eventCard.querySelector('.text-gray-600').textContent;
+            const imageUrl = eventCard.querySelector('img').src;
+
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+    <div class="bg-white rounded-xl max-w-2xl w-full mx-4 overflow-hidden">
+      <div class="relative">
+        <img src="${imageUrl}" class="w-full h-64 object-cover" alt="${eventName}">
+        <button class="absolute top-4 right-4 bg-white/90 w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:text-gray-900 close-modal">
+          <i class="ri-close-line text-xl"></i>
+        </button>
+      </div>
+      <div class="p-6">
+        <h3 class="text-2xl font-bold mb-4">${eventName}</h3>
+        <div class="grid grid-cols-2 gap-6 mb-6">
+          <div>
+            <div class="text-sm text-gray-500 mb-1">Date & Time</div>
+            <div class="font-medium">March 15, 2025 • 8:00 PM</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500 mb-1">Location</div>
+            <div class="font-medium">${location}</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500 mb-1">Duration</div>
+            <div class="font-medium">2.5 hours</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-500 mb-1">Age Restriction</div>
+            <div class="font-medium">All ages welcome</div>
+          </div>
+        </div>
+       
+        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+          <h4 class="font-medium mb-4">Event Description</h4>
+          <p class="text-gray-600 text-sm leading-relaxed">
+            Join us for an unforgettable evening of entertainment. This event promises to deliver an exceptional experience with world-class performances and state-of-the-art production. Don't miss out on this spectacular show that will leave you amazed and inspired.
+          </p>
+        </div>
+       
+        <div class="mb-6">
+          <h4 class="font-medium mb-4">Ticket Options</h4>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-primary transition-colors">
+              <div>
+                <div class="font-medium">Standard Ticket</div>
+                <div class="text-sm text-gray-500">General admission, standing</div>
+              </div>
+              <div class="text-lg font-semibold">$89</div>
+            </div>
+            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-primary transition-colors">
+              <div>
+                <div class="font-medium">VIP Ticket</div>
+                <div class="text-sm text-gray-500">Premium seating, meet & greet</div>
+              </div>
+              <div class="text-lg font-semibold">$199</div>
+            </div>
+          </div>
+        </div>
+       
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-sm text-gray-500">Event Rating</div>
+            <div class="flex items-center space-x-1 text-yellow-400">
+              <i class="ri-star-fill"></i>
+              <i class="ri-star-fill"></i>
+              <i class="ri-star-fill"></i>
+              <i class="ri-star-fill"></i>
+              <i class="ri-star-half-fill"></i>
+              <span class="ml-2 text-gray-600">4.5 (850 reviews)</span>
+            </div>
+          </div>
+          <button class="bg-primary text-white px-8 py-3 rounded-button font-medium hover:bg-opacity-90" onclick="showCheckout()">
+            Get Tickets
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+            document.body.appendChild(modal);
+
+            modal.querySelector('.close-modal').addEventListener('click', () => {
+                modal.remove();
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+<div class="bg-white rounded-xl max-w-2xl w-full mx-4 overflow-hidden">
+<div class="relative">
+<img src="${imageUrl}" class="w-full h-64 object-cover" alt="${venueName}">
+<button class="absolute top-4 right-4 bg-white/90 w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:text-gray-900 close-modal">
+<i class="ri-close-line text-xl"></i>
+</button>
+</div>
+<div class="p-6">
+<h3 class="text-2xl font-bold mb-2">${venueName}</h3>
+<p class="text-gray-600 mb-4">${location}</p>
+<div class="space-y-4 mb-6">
+<div class="flex items-center space-x-2 text-gray-600">
+<i class="ri-map-pin-line"></i>
+<span>4 Pennsylvania Plaza, New York, NY 10001</span>
+</div>
+<div class="flex items-center space-x-2 text-gray-600">
+<i class="ri-phone-line"></i>
+<span>(212) 465-6741</span>
+</div>
+<div class="flex items-center space-x-2 text-gray-600">
+<i class="ri-calendar-line"></i>
+<span>${upcomingEvents}</span>
+</div>
+</div>
+<div class="bg-gray-50 rounded-lg p-4 mb-6">
+<h4 class="font-medium mb-2">Upcoming Events</h4>
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<div>
+<div class="font-medium">NBA: Knicks vs Lakers</div>
+<div class="text-sm text-gray-500">March 15, 2025 • 7:30 PM</div>
+</div>
+<button class="bg-primary text-white px-4 py-2 rounded-button text-sm hover:bg-opacity-90">From $89</button>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<div class="font-medium">Ed Sheeran Concert</div>
+<div class="text-sm text-gray-500">March 20, 2025 • 8:00 PM</div>
+</div>
+<button class="bg-primary text-white px-4 py-2 rounded-button text-sm hover:bg-opacity-90">From $129</button>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<div class="font-medium">WWE Raw</div>
+<div class="text-sm text-gray-500">March 25, 2025 • 7:00 PM</div>
+</div>
+<button class="bg-primary text-white px-4 py-2 rounded-button text-sm hover:bg-opacity-90">From $75</button>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<div class="text-sm text-gray-500">Venue Rating</div>
+<div class="flex items-center space-x-1 text-yellow-400">
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-fill"></i>
+<i class="ri-star-half-fill"></i>
+<span class="ml-2 text-gray-600">4.5 (2,150 reviews)</span>
+</div>
+</div>
+<button class="bg-primary text-white px-6 py-2 rounded-button hover:bg-opacity-90" onclick="showCheckout()">
+Buy Tickets
+</button>
+</div>
+</div>
+</div>
+`;
+        document.body.appendChild(modal);
+        modal.querySelector('.close-modal').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const categoryBtns = document.querySelectorAll('.category-btn');
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    categoryBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            const eventCards = document.querySelectorAll('.event-card');
+            eventCards.forEach(card => {
+                card.addEventListener('click', function () {
+                    const modal = document.createElement('div');
+                    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                    modal.innerHTML = `
+<div class="bg-white rounded-lg max-w-2xl w-full mx-4 overflow-hidden text-gray-900">
+<div class="p-6">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xl font-bold">${this.querySelector('h3').textContent}</h3>
+<button class="text-gray-500 hover:text-gray-700 close-modal">
+<i class="ri-close-line text-2xl"></i>
+</button>
+</div>
+<div class="mb-6">
+<img src="${this.querySelector('img').src}" class="w-full h-64 object-cover rounded-lg" alt="Event">
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div>
+<div class="text-sm text-gray-600 mb-1">Date & Time</div>
+<div class="font-medium">March 15, 2025 at 8:00 PM</div>
+</div>
+<div>
+<div class="text-sm text-gray-600 mb-1">Venue</div>
+<div class="font-medium">${this.querySelector('.text-gray-600 span').textContent}</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="text-sm text-gray-600 mb-2">Price Range</div>
+<div class="flex items-center space-x-4">
+<div class="px-4 py-2 border border-gray-600 rounded-lg">
+<div class="text-sm text-gray-400">Standard</div>
+<div class="font-medium">$89 - $129</div>
+</div>
+<div class="px-4 py-2 border border-gray-600 rounded-lg">
+<div class="text-sm text-gray-400">VIP</div>
+<div class="font-medium">$199 - $299</div>
+</div>
+</div>
+</div>
+<button class="w-full bg-primary text-white py-3 rounded-button font-semibold hover:bg-opacity-90" onclick="window.location.href='checkout.html'">
+Continue to Checkout
+</button>
+</div>
+</div>
+`;
+                    document.body.appendChild(modal);
+                    modal.querySelector('.close-modal').addEventListener('click', () => {
+                        modal.remove();
+                    });
+                });
+            });
+        });
+    </script>
+    <div id="checkout-page" class="fixed inset-0 bg-white z-50 overflow-auto hidden">
+        <header class="bg-white shadow-sm sticky top-0 z-50">
+            <div class="container mx-auto px-4">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <a href="#" class="text-2xl font-['Pacifico'] text-primary">logo</a>
+                        <div class="ml-8 flex items-center space-x-2">
+                            <div
+                                class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                                1</div>
+                            <div class="h-0.5 w-12 bg-gray-200"></div>
+                            <div
+                                class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center">
+                                2</div>
+                            <div class="h-0.5 w-12 bg-gray-200"></div>
+                            <div
+                                class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center">
+                                3</div>
+                        </div>
+                    </div>
+                    <button class="text-gray-500 hover:text-gray-700" onclick="closeCheckout()">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <main class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-3 gap-8">
+                <div class="col-span-2 space-y-8">
+                    <section>
+                        <h2 class="text-xl font-semibold mb-6">Select Tickets</h2>
+                        <div class="bg-white rounded-lg shadow-sm p-6 space-y-6">
+                            <div class="flex items-center justify-between pb-4 border-b">
+                                <div>
+                                    <div class="font-medium">Standard Ticket</div>
+                                    <div class="text-sm text-gray-500">General admission, standing</div>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <div class="text-lg font-semibold">$89</div>
+                                    <div class="flex items-center space-x-2">
+                                        <button
+                                            class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:border-primary hover:text-primary"
+                                            onclick="updateQuantity('standard', -1)">-</button>
+                                        <input type="text" id="standard-quantity" value="0"
+                                            class="w-12 text-center border-none" readonly>
+                                        <button
+                                            class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:border-primary hover:text-primary"
+                                            onclick="updateQuantity('standard', 1)">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="font-medium">VIP Ticket</div>
+                                    <div class="text-sm text-gray-500">Premium seating, meet & greet</div>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <div class="text-lg font-semibold">$199</div>
+                                    <div class="flex items-center space-x-2">
+                                        <button
+                                            class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:border-primary hover:text-primary"
+                                            onclick="updateQuantity('vip', -1)">-</button>
+                                        <input type="text" id="vip-quantity" value="0"
+                                            class="w-12 text-center border-none" readonly>
+                                        <button
+                                            class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:border-primary hover:text-primary"
+                                            onclick="updateQuantity('vip', 1)">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section>
+                        <h2 class="text-xl font-semibold mb-6">Contact Information</h2>
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2 border border-gray-200 rounded-button focus:outline-none focus:border-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2 border border-gray-200 rounded-button focus:outline-none focus:border-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                    <input type="email"
+                                        class="w-full px-4 py-2 border border-gray-200 rounded-button focus:outline-none focus:border-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                                    <input type="tel"
+                                        class="w-full px-4 py-2 border border-gray-200 rounded-button focus:outline-none focus:border-primary">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-span-1">
+                    <div class="bg-white rounded-lg shadow-sm p-6 sticky top-24">
+                        <h3 class="text-lg font-semibold mb-4">Order Summary</h3>
+                        <div class="space-y-4 pb-4 border-b">
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="text-gray-600">Standard Ticket × <span id="standard-summary">0</span></div>
+                                <div class="font-medium">$<span id="standard-total">0</span></div>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="text-gray-600">VIP Ticket × <span id="vip-summary">0</span></div>
+                                <div class="font-medium">$<span id="vip-total">0</span></div>
+                            </div>
+                            <div class="flex items-center justify-between text-sm">
+                                <div class="text-gray-600">Service Fee</div>
+                                <div class="font-medium">$<span id="service-fee">0</span></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between py-4 border-b">
+                            <div class="font-medium">Total</div>
+                            <div class="text-xl font-semibold">$<span id="total-amount">0</span></div>
+                        </div>
+                        <button
+                            class="w-full bg-primary text-white py-3 rounded-button font-semibold hover:bg-opacity-90 mt-6"
+                            onclick="proceedToPayment()">
+                            Continue to Payment
+                        </button>
+                        <div class="mt-4 text-center">
+                            <div class="text-sm text-gray-500">Secure checkout powered by</div>
+                            <div class="flex items-center justify-center space-x-4 mt-2">
+                                <i class="ri-visa-line text-2xl text-gray-400"></i>
+                                <i class="ri-mastercard-line text-2xl text-gray-400"></i>
+                                <i class="ri-paypal-line text-2xl text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        function showCheckout() {
+            document.getElementById('checkout-page').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeCheckout() {
+            document.getElementById('checkout-page').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        function updateQuantity(type, change) {
+            const input = document.getElementById(`${type}-quantity`);
+            const summary = document.getElementById(`${type}-summary`);
+            const total = document.getElementById(`${type}-total`);
+            let value = parseInt(input.value) + change;
+            if (value < 0) value = 0;
+            if (value > 10) value = 10;
+            input.value = value;
+            summary.textContent = value;
+            const price = type === 'standard' ? 89 : 199;
+            total.textContent = (value * price).toFixed(2);
+            updateTotals();
+        }
+        function updateTotals() {
+            const standardTotal = parseFloat(document.getElementById('standard-total').textContent);
+            const vipTotal = parseFloat(document.getElementById('vip-total').textContent);
+            const subtotal = standardTotal + vipTotal;
+            const serviceFee = subtotal * 0.1;
+            document.getElementById('service-fee').textContent = serviceFee.toFixed(2);
+            document.getElementById('total-amount').textContent = (subtotal + serviceFee).toFixed(2);
+        }
+        function proceedToPayment() {
+            const total = parseFloat(document.getElementById('total-amount').textContent);
+            if (total <= 0) {
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                notification.textContent = 'Please select at least one ticket';
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+                return;
+            }
+            const paymentModal = document.createElement('div');
+            paymentModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]';
+            paymentModal.innerHTML = `
+<div class="bg-white rounded-lg max-w-lg w-full mx-4 overflow-hidden">
+<div class="p-6">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-xl font-bold">Payment Details</h3>
+<button class="text-gray-500 hover:text-gray-700 close-payment-modal">
+<i class="ri-close-line text-2xl"></i>
+</button>
+</div>
+<div class="space-y-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+<div class="relative">
+<input type="text" placeholder="1234 5678 9012 3456" class="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-button focus:outline-none focus:border-primary">
+<div class="absolute left-4 top-1/2 -translate-y-1/2">
+<i class="ri-bank-card-line text-gray-400"></i>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+<input type="text" placeholder="MM/YY" class="w-full px-4 py-3 border border-gray-200 rounded-button focus:outline-none focus:border-primary">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+<input type="text" placeholder="123" class="w-full px-4 py-3 border border-gray-200 rounded-button focus:outline-none focus:border-primary">
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Name on Card</label>
+<input type="text" placeholder="John Doe" class="w-full px-4 py-3 border border-gray-200 rounded-button focus:outline-none focus:border-primary">
+</div>
+<div class="pt-4">
+<button class="w-full bg-primary text-white py-3 rounded-button font-semibold hover:bg-opacity-90" onclick="processPayment()">
+Pay $${total.toFixed(2)}
+</button>
+</div>
+<div class="flex items-center justify-center space-x-4 mt-4">
+<i class="ri-visa-fill text-2xl text-gray-600"></i>
+<i class="ri-mastercard-fill text-2xl text-gray-600"></i>
+<i class="ri-paypal-fill text-2xl text-gray-600"></i>
+</div>
+</div>
+</div>
+</div>
+`;
+            document.body.appendChild(paymentModal);
+            paymentModal.querySelector('.close-payment-modal').addEventListener('click', () => {
+                paymentModal.remove();
+            });
+        }
+        function processPayment() {
+            const successModal = document.createElement('div');
+            successModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70]';
+            successModal.innerHTML = `
+<div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 text-center">
+<div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+<i class="ri-check-line text-3xl text-green-500"></i>
+</div>
+<h3 class="text-xl font-bold mb-2">Payment Successful!</h3>
+<p class="text-gray-600 mb-6">Your tickets have been sent to your email.</p>
+<button onclick="window.location.reload()" class="w-full bg-primary text-white py-3 rounded-button font-semibold hover:bg-opacity-90">
+Done
+</button>
+</div>
+`;
+            document.body.appendChild(successModal);
+            // Remove the payment modal
+            document.querySelector('.close-payment-modal').click();
+        }
+    </script>
+
+</body>
+
+</html>
